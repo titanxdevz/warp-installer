@@ -92,11 +92,12 @@ sleep 3
 
 # Step 7: Verify Connectivity
 echo ""
-info "Testing proxy connection through 127.0.0.1:40000..."
+info "Detecting VPS Public IP & testing proxy connection..."
+VPS_IP=$(curl -s --max-time 5 https://api.ipify.org 2>/dev/null || curl -s --max-time 5 https://ipinfo.io/ip 2>/dev/null || echo "127.0.0.1")
 TEST_IP=$(curl -s -x socks5://127.0.0.1:40000 --max-time 10 https://ipinfo.io/ip 2>/dev/null || echo "")
 
 if [ -n "$TEST_IP" ]; then
-    success "Connection test passed! Proxy IP: ${BOLD}${GREEN}${TEST_IP}${NC}"
+    success "Connection test passed! WARP Outgoing IP: ${BOLD}${GREEN}${TEST_IP}${NC}"
 else
     warn "Proxy test timed out on first attempt. WARP daemon might take a few seconds to warm up."
 fi
@@ -106,14 +107,15 @@ echo ""
 echo -e "${GREEN}${BOLD}===============================================================${NC}"
 echo -e "${GREEN}${BOLD}   🎉 CLOUDFLARE WARP PROXY SETUP COMPLETED SUCCESSFULLY!      ${NC}"
 echo -e "${GREEN}${BOLD}===============================================================${NC}"
+echo -e "${CYAN}VPS Public IP  : ${WHITE}${BOLD}${VPS_IP}${NC}"
 echo -e "${CYAN}Proxy Protocol : ${WHITE}${BOLD}SOCKS5${NC}"
-echo -e "${CYAN}Local Host     : ${WHITE}${BOLD}127.0.0.1${NC}"
 echo -e "${CYAN}Proxy Port     : ${WHITE}${BOLD}40000${NC}"
-echo -e "${CYAN}Full URL       : ${GREEN}${BOLD}socks5://127.0.0.1:40000${NC}"
+echo -e "${CYAN}Localhost URL  : ${GREEN}${BOLD}socks5://127.0.0.1:40000${NC}  (Use inside VPS)"
+echo -e "${CYAN}VPS Proxy URL  : ${GREEN}${BOLD}socks5://${VPS_IP}:40000${NC}"
 echo -e "${GREEN}---------------------------------------------------------------${NC}"
 echo -e "${YELLOW}${BOLD}Add this to your Lavalink application.yml:${NC}"
 echo -e "${WHITE}"
-cat << "YAML"
+cat << YAML
 plugins:
   youtube:
     enabled: true
