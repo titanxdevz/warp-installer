@@ -1,58 +1,50 @@
-<div align="center">
+# Cloudflare WARP SOCKS5 Proxy Installer
 
-# ⚡ Cloudflare WARP SOCKS5 Proxy Installer
-
-**Automated 1-Click Installer for Lavalink & Discord Music Bots**
-
-[![GitHub Stars](https://img.shields.io/github/stars/titanxdevz/warp-installer?style=flat-square)](https://github.com/titanxdevz/warp-installer)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
-[![Platform: Ubuntu/Debian](https://img.shields.io/badge/Platform-Ubuntu%20%7C%20Debian-orange?style=flat-square)](https://ubuntu.com/)
-
-</div>
+Enterprise-grade automated deployment script for configuring Cloudflare WARP in SOCKS5 proxy mode on Linux servers. Optimized for Lavalink audio nodes and Discord bots to mitigate rate limits and connection timeouts.
 
 ---
 
-## 📖 Overview
+## Overview
 
-Are your Discord music bots facing **YouTube 429 Rate Limits**, **`AllClientsFailedException`**, or **`Read timed out`** errors on your VPS?
+Modern audio nodes hosted on cloud providers frequently encounter IP-based throttling, HTTP 429 status codes, and `AllClientsFailedException` errors when resolving or streaming YouTube media. 
 
-This repository provides an automated, production-ready Bash installer that equips your server with **Cloudflare WARP in SOCKS5 Proxy Mode** on local port `127.0.0.1:40000`. It routes all Lavalink YouTube traffic through Cloudflare's clean edge network, bypassing bot detection and regional IP restrictions completely.
+This repository provides an automated installation script that sets up Cloudflare WARP in local proxy mode. Traffic routed through this local SOCKS5 interface egresses via Cloudflare's anycast edge network, bypassing data center IP restrictions and ensuring reliable playback throughput.
 
 ---
 
-## 🚀 Quick Install (1-Line Command)
+## Quick Start
 
-Run this command directly in your Ubuntu / Debian VPS terminal:
+Execute the following command in your server terminal:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/titanxdevz/warp-installer/main/scripts/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/titanxdevz/warp-installer/main/scripts/install.sh | sudo bash
 ```
 
 ---
 
-## 🛠 Manual Installation
+## Manual Installation
 
-If you prefer to review or run the script manually:
+To inspect and run the script manually:
 
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone https://github.com/titanxdevz/warp-installer.git
 
-# 2. Enter directory
+# Navigate to the scripts directory
 cd warp-installer/scripts
 
-# 3. Give execute permission
+# Grant execution permissions
 chmod +x install.sh
 
-# 4. Run installer
+# Run the installer with elevated privileges
 sudo ./install.sh
 ```
 
 ---
 
-## ⚙️ Lavalink Configuration (`application.yml`)
+## Lavalink Configuration
 
-Once the installer finishes, add the proxy setting to your Lavalink `application.yml` under the `youtube` plugin:
+Once the deployment finishes, configure your Lavalink `application.yml` file to route YouTube requests through the local proxy:
 
 ```yaml
 plugins:
@@ -70,45 +62,51 @@ plugins:
       url: "socks5://127.0.0.1:40000"
 ```
 
-Restart Lavalink, and all playback and searches will now stream seamlessly through Cloudflare!
+Restart the Lavalink process or container to apply the configuration.
 
 ---
 
-## 🔍 Verification Commands
+## Verification and Diagnostics
 
-Test if the proxy is healthy and functioning on your server:
+Verify the status and integrity of the local proxy using the following commands:
 
+Check service status:
 ```bash
-# Check Cloudflare WARP service status
 warp-cli status
+```
 
-# Test connection and view assigned Cloudflare IP
+Test proxy egress connectivity and verify public IP:
+```bash
 curl -x socks5://127.0.0.1:40000 https://ipinfo.io
+```
 
-# Verify Cloudflare trace (look for warp=on)
+Inspect Cloudflare network trace:
+```bash
 curl -x socks5://127.0.0.1:40000 https://cloudflare.com/cdn-cgi/trace
 ```
 
----
-
-## ✨ Features
-
-- 🛡️ **Root & Architecture Safety Checks**: Verifies AMD64 / x86_64 system requirements.
-- 🔑 **Automated Keyring & Repo Setup**: Installs official Cloudflare GPG keys and APT sources.
-- ⚡ **Zero-Touch Config**: Registers client, switches to SOCKS5 proxy mode, and binds to port `40000`.
-- 🧪 **Self-Test on Completion**: Automatically tests connectivity before exiting.
-- 🔒 **Secure Localhost Only**: Doesn't expose ports publicly to the internet.
+A response containing `warp=on` indicates that traffic is successfully egressing through the Cloudflare network.
 
 ---
 
-## 👤 Author & Credits
+## Key Features
 
-- **Repository**: [titanxdevz/warp-installer](https://github.com/titanxdevz/warp-installer)
-- **Author**: TitanX ([@titanxdevz](https://github.com/titanxdevz))
-- **Email**: `inkmcontop@gmail.com`
+- **System Compatibility Verification**: Enforces required architecture (x86_64 / amd64) and privilege levels.
+- **Repository Management**: Automates GPG key import and APT source list configuration.
+- **Non-Intrusive Networking**: Operates in user-space proxy mode without modifying primary host routing tables or default gateways.
+- **Automated Validation**: Performs end-to-end handshake validation against Cloudflare endpoints upon deployment.
+- **Localhost Binding**: Binds strictly to `127.0.0.1:40000` to prevent unauthorized external access.
 
 ---
 
-## 📄 License
+## System Requirements
+
+- Operating System: Ubuntu 20.04 LTS / 22.04 LTS / 24.04 LTS, Debian 11 / 12
+- Architecture: amd64 / x86_64
+- Permissions: Root or sudo access
+
+---
+
+## License
 
 This project is licensed under the MIT License.
